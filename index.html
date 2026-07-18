@@ -1,0 +1,318 @@
+﻿<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>eDziennik RP</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <section id="loginScreen" class="login-screen">
+      <div class="login-card">
+        <div class="brand login-brand">
+          <div class="brand-mark" id="loginBrandMark" aria-hidden="true">ED</div>
+          <div>
+            <p class="eyebrow">Discord RolePlay</p>
+            <h1 id="loginSchoolName">eDziennik RP</h1>
+          </div>
+        </div>
+        <p class="login-copy">Zaloguj się kontem Discord. Rola i postać są przypisywane w panelu kont przez administrację szkoły.</p>
+        <button id="discordLoginButton" class="discord-button" type="button">Zaloguj przez Discord</button>
+        <div id="discordLoginHint" class="login-hint"></div>
+        <div class="login-divider"><span>tryb administracyjny prototypu</span></div>
+        <label class="field">
+          <span>Konto lokalne</span>
+          <select id="quickAccountSelect"></select>
+        </label>
+        <button id="localLoginButton" class="secondary-button" type="button">Wejdź lokalnie</button>
+      </div>
+    </section>
+
+    <div id="appShell" class="app-shell app-hidden">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" id="brandMark" aria-hidden="true">ED</div>
+          <div>
+            <p class="eyebrow">Discord RolePlay</p>
+            <h1 id="brandName">eDziennik RP</h1>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="Główna nawigacja">
+          <button class="nav-item active" data-section="dashboard">Panel</button>
+          <button class="nav-item" data-section="accounts">Konta</button>
+          <button class="nav-item" data-section="students">Uczniowie</button>
+          <button class="nav-item" data-section="teachers">Nauczyciele</button>
+          <button class="nav-item" data-section="workers">Pracownicy</button>
+          <button class="nav-item" data-section="prefects">Prefekci</button>
+          <button class="nav-item" data-section="houses">Domy</button>
+          <button class="nav-item" data-section="grades">Oceny</button>
+          <button class="nav-item" data-section="attendance">Frekwencja</button>
+          <button class="nav-item" data-section="schedule">Plan</button>
+          <button class="nav-item" data-section="clubs">Kluby</button>
+          <button class="nav-item" data-section="announcements">Ogłoszenia</button>
+          <button class="nav-item" data-section="points">Punkty</button>
+          <button class="nav-item" data-section="data">Dane</button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Logowanie Discord</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">eDziennik szkolny</p>
+            <h2 id="sectionTitle">Panel</h2>
+          </div>
+          <div class="top-actions">
+            <div id="currentAccountPill" class="account-pill"></div>
+            <button id="logoutButton" class="secondary-button" type="button">Wyloguj</button>
+          </div>
+        </header>
+
+        <section id="dashboard" class="view active-view">
+          <div class="banner">
+            <div>
+              <p class="eyebrow" id="semesterLabel">Semestr I</p>
+              <h3 id="dashboardSchool">Akademia Northwood RP</h3>
+              <p id="discordLabel">#sekretariat-rp</p>
+            </div>
+            <div class="crest" id="schoolCrest" aria-hidden="true"><span>RP</span></div>
+          </div>
+          <div class="metric-grid">
+            <article class="metric"><span class="metric-label">Uczniowie</span><strong id="metricStudents">0</strong></article>
+            <article class="metric accent-teal"><span class="metric-label">Konta</span><strong id="metricAccounts">0</strong></article>
+            <article class="metric accent-red"><span class="metric-label">Frekwencja</span><strong id="metricAttendance">0%</strong></article>
+            <article class="metric accent-gold"><span class="metric-label">Punkty domów</span><strong id="metricHousePoints">0</strong></article>
+          </div>
+          <div class="split-layout">
+            <section class="panel"><div class="panel-head"><h3>Plan tego tygodnia</h3><span id="dashboardWeek" class="pill">Tydzień</span></div><div id="dashboardLessons" class="stack-list"></div></section>
+            <section class="panel"><div class="panel-head"><h3>Ranking domów</h3><span class="pill muted">Punkty</span></div><div id="houseScoreboard" class="score-list"></div></section>
+          </div>
+        </section>
+
+        <section id="accounts" class="view">
+          <form id="accountForm" class="panel form-grid" data-scope="accounts">
+            <input id="accountEditId" type="hidden" />
+            <label class="field"><span>Discord ID</span><input id="accountDiscordId" required placeholder="np. 123456789012345678" /></label>
+            <label class="field"><span>Nazwa konta</span><input id="accountDisplayName" required placeholder="np. Kuba" /></label>
+            <label class="field"><span>Avatar URL</span><input id="accountAvatarUrl" placeholder="https://..." /></label>
+            <label class="field"><span>Rola</span><select id="accountRole"></select></label>
+            <label class="field"><span>Typ postaci</span><select id="accountCharacterType"></select></label>
+            <label class="field"><span>Postać</span><select id="accountCharacterId"></select></label>
+            <label class="field"><span>Status</span><select id="accountStatus"></select></label>
+            <button class="primary-button" type="submit">Zapisz konto</button>
+            <button id="cancelAccountEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Konto</th><th>Rola</th><th>Postać</th><th>Status</th><th></th></tr></thead><tbody id="accountsTable"></tbody></table></div>
+        </section>
+
+        <section id="students" class="view">
+          <div class="toolbar"><label class="field"><span>Szukaj</span><input id="studentSearch" type="search" placeholder="Imię, konto, dom" /></label><label class="field"><span>Rocznik</span><select id="studentYearFilter"></select></label><label class="field"><span>Dom</span><select id="studentHouseFilter"></select></label></div>
+          <form id="studentForm" class="panel form-grid" data-scope="students">
+            <input id="studentEditId" type="hidden" />
+            <label class="field"><span>Imię i nazwisko</span><input id="studentName" required /></label>
+            <label class="field"><span>Konto Discord</span><select id="studentAccountId"></select></label>
+            <label class="field"><span>Rocznik</span><select id="studentYear"></select></label>
+            <label class="field"><span>Dom</span><select id="studentHouse"></select></label>
+            <label class="field"><span>Status</span><select id="studentStatus"></select></label>
+            <button class="primary-button" type="submit">Zapisz ucznia</button>
+            <button id="cancelStudentEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Uczeń</th><th>Konto</th><th>Rocznik</th><th>Dom</th><th>Status</th><th>Śr. końcoworoczna</th><th>Punkty</th><th></th></tr></thead><tbody id="studentsTable"></tbody></table></div>
+        </section>
+
+        <section id="teachers" class="view">
+          <form id="teacherForm" class="panel form-grid" data-scope="teachers">
+            <input id="teacherEditId" type="hidden" />
+            <label class="field"><span>Imię i nazwisko</span><input id="teacherName" required /></label>
+            <label class="field"><span>Konto Discord</span><select id="teacherAccountId"></select></label>
+            <label class="field"><span>Funkcja</span><input id="teacherPosition" placeholder="np. Profesor eliksirów" /></label>
+            <label class="field"><span>Status</span><select id="teacherStatus"></select></label>
+            <label class="field wide"><span>Przedmioty</span><select id="teacherSubjects" class="multi-select" multiple></select></label>
+            <button class="primary-button" type="submit">Zapisz nauczyciela</button>
+            <button id="cancelTeacherEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Nauczyciel</th><th>Konto</th><th>Funkcja</th><th>Przedmioty</th><th>Status</th><th></th></tr></thead><tbody id="teachersTable"></tbody></table></div>
+        </section>
+
+        <section id="workers" class="view">
+          <form id="workerForm" class="panel form-grid" data-scope="workers">
+            <input id="workerEditId" type="hidden" />
+            <label class="field"><span>Imię i nazwisko</span><input id="workerName" required /></label>
+            <label class="field"><span>Konto Discord</span><select id="workerAccountId"></select></label>
+            <label class="field"><span>Funkcja</span><input id="workerPosition" placeholder="np. Bibliotekarz" /></label>
+            <label class="field"><span>Status</span><select id="workerStatus"></select></label>
+            <button class="primary-button" type="submit">Zapisz pracownika</button>
+            <button id="cancelWorkerEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Pracownik</th><th>Konto</th><th>Funkcja</th><th>Status</th><th></th></tr></thead><tbody id="workersTable"></tbody></table></div>
+        </section>
+
+        <section id="prefects" class="view">
+          <form id="prefectForm" class="panel form-grid" data-scope="prefects">
+            <input id="prefectEditId" type="hidden" />
+            <label class="field"><span>Imię i nazwisko</span><input id="prefectName" required /></label>
+            <label class="field"><span>Konto Discord</span><select id="prefectAccountId"></select></label>
+            <label class="field"><span>Uczeń</span><select id="prefectStudentId"></select></label>
+            <label class="field"><span>Dom</span><select id="prefectHouse"></select></label>
+            <label class="field"><span>Status</span><select id="prefectStatus"></select></label>
+            <label class="check-field"><input id="prefectHead" type="checkbox" /><span>Prefekt naczelny</span></label>
+            <button class="primary-button" type="submit">Zapisz prefekta</button>
+            <button id="cancelPrefectEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Prefekt</th><th>Konto</th><th>Uczeń</th><th>Dom</th><th>Typ</th><th>Status</th><th></th></tr></thead><tbody id="prefectsTable"></tbody></table></div>
+        </section>
+
+        <section id="houses" class="view">
+          <form id="houseForm" class="panel form-grid" data-scope="houses">
+            <input id="houseEditId" type="hidden" />
+            <label class="field"><span>Nazwa domu</span><input id="houseName" required /></label>
+            <label class="field"><span>Kolor</span><input id="houseColor" type="color" value="#2f6f73" /></label>
+            <label class="field"><span>Herb domu</span><input id="houseCrestUpload" type="file" accept="image/*" /></label>
+            <label class="field wide"><span>Opis</span><input id="houseDescription" /></label>
+            <div class="logo-preview" id="houseCrestPreview"></div>
+            <button class="primary-button" type="submit">Zapisz dom</button>
+            <button id="cancelHouseEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Dom</th><th>Opis</th><th>Uczniowie</th><th>Punkty</th><th></th></tr></thead><tbody id="housesTable"></tbody></table></div>
+        </section>
+
+        <section id="grades" class="view">
+          <div class="toolbar"><label class="field"><span>Rocznik</span><select id="gradeYearFilter"></select></label><label class="field"><span>Dom</span><select id="gradeHouseFilter"></select></label><label class="field"><span>Przedmiot</span><select id="gradeSubjectFilter"></select></label></div>
+          <form id="gradeForm" class="panel" data-scope="grades">
+            <div class="form-grid no-margin">
+              <label class="field"><span>Przedmiot</span><select id="gradeSubject"></select></label>
+              <label class="field"><span>Nauczyciel</span><select id="gradeTeacher" disabled></select></label>
+              <label class="field"><span>Opis / kategoria</span><input id="gradeDescription" required placeholder="np. Sprawdzian końcowy" /></label>
+              <label class="field"><span>Data</span><input id="gradeDate" type="date" /></label>
+              <label class="field"><span>Typ</span><select id="gradeKind"><option value="regular">Cząstkowa</option><option value="finalYear">Końcoworoczna</option></select></label>
+              <button id="refreshGradeRoster" class="secondary-button" type="button">Odśwież listę</button>
+            </div>
+            <div id="gradeBatchRows" class="batch-grid"></div>
+            <button class="primary-button" type="submit">Dodaj oceny zaznaczonym</button>
+          </form>
+          <div class="panel table-panel"><table><thead><tr><th>Uczeń</th><th>Rocznik</th><th>Dom</th><th>Średnia końcoworoczna</th><th>Oceny</th></tr></thead><tbody id="gradebookTable"></tbody></table></div>
+        </section>
+
+        <section id="attendance" class="view">
+          <div class="toolbar"><label class="field"><span>Rocznik</span><select id="attendanceYearFilter"></select></label><label class="field"><span>Data</span><input id="attendanceDateFilter" type="date" /></label><label class="field"><span>Przedmiot</span><select id="attendanceSubjectFilter"></select></label></div>
+          <form id="attendanceForm" class="panel" data-scope="attendance">
+            <input id="attendanceSessionEditId" type="hidden" />
+            <div class="form-grid no-margin">
+              <label class="field"><span>Data lekcji</span><input id="attendanceDate" type="date" /></label>
+              <label class="field"><span>Dzień</span><input id="attendanceDayLabel" readonly /></label>
+              <label class="field wide"><span>Roczniki</span><select id="attendanceYears" class="multi-select" multiple></select></label>
+              <label class="field"><span>Przedmiot z planu</span><select id="attendanceSubject"></select></label>
+              <label class="field"><span>Nauczyciel</span><select id="attendanceTeacher" disabled></select></label>
+              <button id="refreshAttendanceRoster" class="secondary-button" type="button">Odśwież listę</button>
+            </div>
+            <div id="attendanceRoster" class="roster-grid"></div>
+            <button class="primary-button" type="submit">Zapisz frekwencję</button>
+            <button id="cancelAttendanceEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="split-layout wide-left"><section class="panel table-panel"><div class="panel-head"><h3>Podsumowanie</h3></div><table><thead><tr><th>Uczeń</th><th>Rocznik</th><th>Obecności</th><th>Spóźnienia</th><th>Nieobecności</th><th>Frekwencja</th></tr></thead><tbody id="attendanceSummaryTable"></tbody></table></section><section class="panel"><div class="panel-head"><h3>Lekcje</h3></div><div id="attendanceSessions" class="stack-list"></div></section></div>
+        </section>
+
+        <section id="schedule" class="view">
+          <div class="toolbar"><span id="currentWeekLabel" class="pill">Bieżący tydzień</span><button id="previousWeek" class="secondary-button" type="button">Poprzedni</button><button id="currentWeek" class="secondary-button" type="button">Ten tydzień</button><button id="nextWeek" class="secondary-button" type="button">Następny</button><label class="field"><span>Rocznik</span><select id="scheduleYearFilter"></select></label></div>
+          <form id="scheduleForm" class="panel form-grid" data-scope="schedule">
+            <input id="scheduleEditId" type="hidden" />
+            <label class="field"><span>Data zajęć</span><input id="scheduleDate" type="date" /></label>
+            <label class="field"><span>Dzień</span><input id="scheduleDayLabel" readonly /></label>
+            <label class="field"><span>Godzina</span><select id="scheduleTime"></select></label>
+            <label class="field wide"><span>Roczniki</span><select id="scheduleYears" class="multi-select" multiple></select></label>
+            <label class="field"><span>Typ zajęć</span><select id="scheduleItemType"><option value="subject">Przedmiot</option><option value="club">Klub</option></select></label>
+            <label class="field"><span>Zajęcia</span><select id="scheduleItemId"></select></label>
+            <label class="field"><span>Nauczyciel / opiekun</span><select id="scheduleTeacher" disabled></select></label>
+            <label class="field"><span>Sala / miejsce</span><input id="scheduleRoom" placeholder="np. Wieża A" /></label>
+            <label class="field wide"><span>Temat</span><input id="scheduleTitle" placeholder="np. Eliksiry obronne" /></label>
+            <button class="primary-button" type="submit">Zapisz zajęcia</button>
+            <button id="cancelScheduleEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div id="scheduleGrid" class="schedule-grid"></div>
+        </section>
+
+        <section id="clubs" class="view">
+          <form id="clubForm" class="panel" data-scope="clubs">
+            <input id="clubEditId" type="hidden" />
+            <div class="form-grid no-margin">
+              <label class="field"><span>Nazwa klubu</span><input id="clubName" required placeholder="np. Klub Pojedynków" /></label>
+              <label class="field"><span>Kolor</span><input id="clubColor" type="color" value="#3d67a3" /></label>
+              <label class="field"><span>Ikona / herb</span><input id="clubCrestUpload" type="file" accept="image/*" /></label>
+              <div class="logo-preview" id="clubCrestPreview"></div>
+            </div>
+            <div class="builder-panel">
+              <div class="panel-head"><h3>Pola klubu</h3><span class="pill muted">administrator ustala wymagania</span></div>
+              <div class="form-grid no-margin">
+                <label class="field"><span>Nazwa pola</span><input id="clubFieldLabel" placeholder="np. Opiekun" /></label>
+                <label class="field"><span>Forma</span><select id="clubFieldType"><option value="teacher">Wybór nauczyciela</option><option value="students">Wybór uczniów</option><option value="studentRoles">Uczniowie z rolami</option><option value="text">Tekst</option><option value="details">Wysuwana wiadomość</option></select></label>
+                <button id="addClubField" class="secondary-button" type="button">Dodaj pole</button>
+              </div>
+              <div id="clubFieldList" class="stack-list"></div>
+              <div id="clubDynamicFields" class="form-grid"></div>
+            </div>
+            <button class="primary-button" type="submit">Zapisz klub</button>
+            <button id="cancelClubEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div id="clubsList" class="announcement-list"></div>
+        </section>
+
+        <section id="announcements" class="view">
+          <form id="announcementForm" class="panel form-grid" data-scope="announcements">
+            <input id="announcementEditId" type="hidden" />
+            <label class="field"><span>Tytuł</span><input id="announcementTitle" required /></label>
+            <label class="field"><span>Adresaci</span><select id="announcementAudience"></select></label>
+            <label class="field"><span>Data</span><input id="announcementDate" type="date" /></label>
+            <label class="check-field"><input id="announcementPinned" type="checkbox" /><span>Przypięte</span></label>
+            <label class="field wide"><span>Treść</span><textarea id="announcementBody" rows="3" required></textarea></label>
+            <button class="primary-button" type="submit">Zapisz ogłoszenie</button>
+            <button id="cancelAnnouncementEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div id="announcementList" class="announcement-list"></div>
+        </section>
+
+        <section id="points" class="view">
+          <form id="pointForm" class="panel form-grid" data-scope="points">
+            <input id="pointEditId" type="hidden" />
+            <label class="field"><span>Uczeń</span><select id="pointStudent"></select></label>
+            <label class="field"><span>Typ</span><select id="pointType"><option value="plus">Punkty dodatnie</option><option value="minus">Punkty ujemne</option><option value="note">Uwaga bez punktów</option></select></label>
+            <label class="field"><span>Wartość</span><input id="pointValue" type="number" min="0" max="200" value="5" /></label>
+            <label class="field"><span>Autor</span><select id="pointAuthor"></select></label>
+            <label class="field"><span>Opis / kategoria</span><input id="pointCategory" placeholder="np. Pomoc" /></label>
+            <label class="field"><span>Data</span><input id="pointDate" type="date" /></label>
+            <label class="field wide"><span>Treść</span><textarea id="pointBody" rows="3" required></textarea></label>
+            <button class="primary-button" type="submit">Zapisz wpis</button>
+            <button id="cancelPointEdit" class="secondary-button" type="button">Anuluj edycję</button>
+          </form>
+          <div class="split-layout"><section class="panel"><div class="panel-head"><h3>Punkty domów</h3></div><div id="pointsHouseScoreboard" class="score-list"></div></section><section class="panel"><div class="panel-head"><h3>Wpisy</h3></div><div id="pointList" class="announcement-list"></div></section></div>
+        </section>
+
+        <section id="data" class="view">
+          <form id="settingsForm" class="panel form-grid" data-scope="settings">
+            <label class="field"><span>Nazwa szkoły</span><input id="schoolNameInput" required /></label>
+            <label class="field"><span>Semestr</span><input id="semesterInput" required /></label>
+            <label class="field"><span>Kanał Discord</span><input id="discordInput" required /></label>
+            <label class="field"><span>Logo szkoły</span><input id="logoUpload" type="file" accept="image/*" /></label>
+            <label class="field wide"><span>Roczniki</span><input id="yearsInput" placeholder="I, II, III" /></label>
+            <label class="field wide"><span>Przedmioty obowiązkowe</span><input id="requiredSubjectsInput" placeholder="Eliksiry, Zaklęcia" /></label>
+            <label class="field wide"><span>Przedmioty dodatkowe</span><input id="optionalSubjectsInput" placeholder="Klub pojedynków, Astronomia" /></label>
+            <label class="field"><span>Discord Client ID</span><input id="discordClientIdInput" placeholder="ID aplikacji OAuth" /></label>
+            <label class="field wide"><span>Redirect URI</span><input id="discordRedirectUriInput" placeholder="adres tej strony" /></label>
+            <label class="check-field"><input id="allowLocalLoginInput" type="checkbox" /><span>Pokaż logowanie lokalne</span></label>
+            <div class="logo-preview" id="logoPreview"></div>
+            <button id="removeLogo" class="secondary-button" type="button">Usuń logo</button>
+            <button class="primary-button" type="submit">Zapisz ustawienia</button>
+          </form>
+          <div class="split-layout"><section class="panel"><div class="panel-head"><h3>Eksport</h3><button id="downloadJson" class="secondary-button" type="button">Pobierz JSON</button></div><textarea id="exportBox" class="code-box" rows="12" readonly></textarea></section><section class="panel"><div class="panel-head"><h3>Import</h3><button id="resetDemo" class="danger-button" type="button" data-scope="settings">Reset demo</button></div><textarea id="importBox" class="code-box" rows="12" placeholder="Wklej eksport JSON"></textarea><button id="importJson" class="primary-button" type="button" data-scope="settings">Wczytaj JSON</button></section></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
