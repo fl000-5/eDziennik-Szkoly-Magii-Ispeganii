@@ -1,1 +1,1 @@
-# eDziennik Szkoly Magii Ispeganii
+# eDziennik Szkoły Magii Ispeganii
