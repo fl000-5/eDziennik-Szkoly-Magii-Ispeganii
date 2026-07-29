@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>eDziennik Szkoły Magii Ispeganii</title>
-    <link rel="icon" href="/eDziennik-Szkoly-Magii-Ispeganii/Herb Szkoły Magii Ispeganii.png">
+    <link rel="icon" type="image/png" href="./Herb Szkoły Magii Ispeganii.png" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -85,9 +85,9 @@
           </div>
           <div class="metric-grid">
             <article class="metric"><span class="metric-label">Uczniowie</span><strong id="metricStudents">0</strong></article>
-            <article class="metric accent-teal"><span class="metric-label">Konta</span><strong id="metricAccounts">0</strong></article>
-            <article class="metric accent-red"><span class="metric-label">Frekwencja</span><strong id="metricAttendance">0%</strong></article>
-            <article class="metric accent-gold"><span class="metric-label">Punkty domów</span><strong id="metricHousePoints">0</strong></article>
+            <article class="metric accent-teal"><span class="metric-label">Nauczyciele</span><strong id="metricAccounts">0</strong></article>
+            <article class="metric accent-red"><span class="metric-label">Praktykanci</span><strong id="metricAttendance">0</strong></article>
+            <article class="metric accent-gold"><span class="metric-label">Pracownicy</span><strong id="metricHousePoints">0</strong></article>
           </div>
           <div class="split-layout">
             <section class="panel"><div class="panel-head"><h3>Plan tego tygodnia</h3><span id="dashboardWeek" class="pill">Tydzień</span></div><div id="dashboardLessons" class="stack-list"></div></section>
@@ -101,9 +101,9 @@
             <label class="field"><span>Discord ID</span><input id="accountDiscordId" required placeholder="np. 123456789012345678" /></label>
             <label class="field"><span>Nazwa konta</span><input id="accountDisplayName" required placeholder="np. Kuba" /></label>
             <label class="field"><span>Avatar URL</span><input id="accountAvatarUrl" placeholder="https://..." /></label>
-            <label class="field"><span>Rola</span><select id="accountRole"></select></label>
-            <label class="field"><span>Typ postaci</span><select id="accountCharacterType"></select></label>
-            <label class="field"><span>Postać</span><select id="accountCharacterId"></select></label>
+            <div class="field wide"><span>Role</span><div id="accountRole" class="checkbox-grid"></div></div>
+            <div class="field wide"><span>Postacie</span><div id="accountCharacterId" class="checkbox-grid tall"></div></div>
+            <input id="accountCharacterType" type="hidden" value="multi" />
             <label class="field"><span>Status</span><select id="accountStatus"></select></label>
             <button class="primary-button" type="submit">Zapisz konto</button>
             <button id="cancelAccountEdit" class="secondary-button" type="button">Anuluj edycję</button>
@@ -133,7 +133,7 @@
             <label class="field"><span>Konto Discord</span><select id="teacherAccountId"></select></label>
             <label class="field"><span>Funkcja</span><input id="teacherPosition" placeholder="np. Profesor eliksirów" /></label>
             <label class="field"><span>Status</span><select id="teacherStatus"></select></label>
-            <label class="field wide"><span>Przedmioty</span><select id="teacherSubjects" class="multi-select" multiple></select></label>
+            <div class="field wide"><span>Przedmioty</span><div id="teacherSubjects" class="checkbox-grid"></div></div>
             <button class="primary-button" type="submit">Zapisz nauczyciela</button>
             <button id="cancelTeacherEdit" class="secondary-button" type="button">Anuluj edycję</button>
           </form>
@@ -165,7 +165,7 @@
             <button class="primary-button" type="submit">Zapisz prefekta</button>
             <button id="cancelPrefectEdit" class="secondary-button" type="button">Anuluj edycję</button>
           </form>
-          <div class="panel table-panel"><table><thead><tr><th>Prefekt</th><th>Konto</th><th>Uczeń</th><th>Dom</th><th>Typ</th><th>Status</th><th></th></tr></thead><tbody id="prefectsTable"></tbody></table></div>
+          <div class="panel table-panel"><table><thead><tr><th>Uczeń</th><th>Konto</th><th>Dom</th><th>Typ</th><th>Status</th><th></th></tr></thead><tbody id="prefectsTable"></tbody></table></div>
         </section>
 
         <section id="houses" class="view">
@@ -190,10 +190,10 @@
               <label class="field"><span>Nauczyciel</span><select id="gradeTeacher" disabled></select></label>
               <label class="field"><span>Opis / kategoria</span><input id="gradeDescription" required placeholder="np. Sprawdzian końcowy" /></label>
               <label class="field"><span>Data</span><input id="gradeDate" type="date" /></label>
-              <label class="field"><span>Typ</span><select id="gradeKind"><option value="regular">Cząstkowa</option><option value="finalYear">Końcoworoczna</option></select></label>
+              <label class="field"><span>Typ</span><select id="gradeKind"><option value="regular">Cząstkowa</option><option value="proposedFinalYear">Proponowana końcoworoczna</option><option value="finalYear">Końcoworoczna</option></select></label>
               <button id="refreshGradeRoster" class="secondary-button" type="button">Odśwież listę</button>
             </div>
-            <div id="gradeBatchRows" class="batch-grid"></div>
+            <div class="batch-head"><span>Uczeń</span><span>Rocznik i dom</span><span>Ocena</span><span>Waga</span></div><div id="gradeBatchRows" class="batch-grid"></div>
             <button class="primary-button" type="submit">Dodaj oceny zaznaczonym</button>
           </form>
           <div class="panel table-panel"><table><thead><tr><th>Uczeń</th><th>Rocznik</th><th>Dom</th><th>Średnia końcoworoczna</th><th>Oceny</th></tr></thead><tbody id="gradebookTable"></tbody></table></div>
@@ -229,7 +229,7 @@
             <label class="field"><span>Typ zajęć</span><select id="scheduleItemType"><option value="subject">Przedmiot</option><option value="club">Klub</option></select></label>
             <label class="field"><span>Zajęcia</span><select id="scheduleItemId"></select></label>
             <label class="field"><span>Nauczyciel / opiekun</span><select id="scheduleTeacher" disabled></select></label>
-            <label class="field"><span>Sala / miejsce</span><input id="scheduleRoom" placeholder="np. Wieża A" /></label>
+            <label class="field"><span>Miejsce</span><input id="scheduleRoom" placeholder="np. Wieża A" /></label>
             <label class="field wide"><span>Temat</span><input id="scheduleTitle" placeholder="np. Eliksiry obronne" /></label>
             <button class="primary-button" type="submit">Zapisz zajęcia</button>
             <button id="cancelScheduleEdit" class="secondary-button" type="button">Anuluj edycję</button>
@@ -250,7 +250,7 @@
               <div class="panel-head"><h3>Pola klubu</h3><span class="pill muted">administrator ustala wymagania</span></div>
               <div class="form-grid no-margin">
                 <label class="field"><span>Nazwa pola</span><input id="clubFieldLabel" placeholder="np. Opiekun" /></label>
-                <label class="field"><span>Forma</span><select id="clubFieldType"><option value="teacher">Wybór nauczyciela</option><option value="students">Wybór uczniów</option><option value="studentRoles">Uczniowie z rolami</option><option value="text">Tekst</option><option value="details">Wysuwana wiadomość</option></select></label>
+                <label class="field"><span>Forma</span><select id="clubFieldType"><option value="teacher">Wybór nauczyciela</option><option value="teachers">Wybór wielu nauczycieli</option><option value="students">Wybór uczniów</option><option value="studentRoles">Uczniowie z rolami</option><option value="text">Tekst</option><option value="details">Wysuwana wiadomość</option></select></label>
                 <button id="addClubField" class="secondary-button" type="button">Dodaj pole</button>
               </div>
               <div id="clubFieldList" class="stack-list"></div>
@@ -266,7 +266,7 @@
           <form id="announcementForm" class="panel form-grid" data-scope="announcements">
             <input id="announcementEditId" type="hidden" />
             <label class="field"><span>Tytuł</span><input id="announcementTitle" required /></label>
-            <label class="field"><span>Adresaci</span><select id="announcementAudience"></select></label>
+            <div class="field wide"><span>Adresaci</span><div id="announcementAudience" class="checkbox-grid"></div></div>
             <label class="field"><span>Data</span><input id="announcementDate" type="date" /></label>
             <label class="check-field"><input id="announcementPinned" type="checkbox" /><span>Przypięte</span></label>
             <label class="field wide"><span>Treść</span><textarea id="announcementBody" rows="3" required></textarea></label>
@@ -279,7 +279,7 @@
         <section id="points" class="view">
           <form id="pointForm" class="panel form-grid" data-scope="points">
             <input id="pointEditId" type="hidden" />
-            <label class="field"><span>Uczeń</span><select id="pointStudent"></select></label>
+            <div class="field wide"><span>Uczniowie</span><div id="pointStudent" class="checkbox-grid tall"></div></div>
             <label class="field"><span>Typ</span><select id="pointType"><option value="plus">Punkty dodatnie</option><option value="minus">Punkty ujemne</option><option value="note">Uwaga bez punktów</option></select></label>
             <label class="field"><span>Wartość</span><input id="pointValue" type="number" min="0" max="200" value="5" /></label>
             <label class="field"><span>Autor</span><select id="pointAuthor"></select></label>
@@ -317,3 +317,8 @@
     <script src="./app.js"></script>
   </body>
 </html>
+
+
+
+
+

@@ -9,7 +9,7 @@
   const roles = ["Administrator", "Dyrektor", "Wicedyrektor", "Nauczyciel", "Praktykant", "Pracownik szkoły", "Prefekt", "Uczeń"];
   const schoolDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"];
   const lessonTimes = ["18:00-19:00", "19:00-20:00", "20:00-21:00", "21:00-22:00", "22:00-23:00"];
-  const gradeValues = ["6", "5+", "5", "4+", "4", "3+", "3", "2+", "2", "1"];
+  const gradeValues = ["N (1)", "M (2)", "W (3)", "P (4)", "Z (5)", "I (6)"];
   const fullRoles = new Set(["Administrator", "Dyrektor", "Wicedyrektor"]);
   const teacherRoles = new Set(["Nauczyciel", "Praktykant"]);
   const pointsRoles = new Set(["Nauczyciel", "Praktykant", "Pracownik szkoły", "Prefekt"]);
@@ -56,9 +56,9 @@
       { id: "house-ivy", name: "Ivythorn", color: "#2f7d57", description: "Ciekawość, wiedza i cierpliwa praca.", crestDataUrl: "" },
     ],
     accounts: [
-      { id: "acc-admin", discordId: "local-admin", displayName: "Administrator lokalny", avatarUrl: "", role: "Administrator", characterType: "none", characterId: "", status: "Aktywna" },
-      { id: "acc-lena", discordId: "100000000000000001", displayName: "LenaRP", avatarUrl: "", role: "Uczeń", characterType: "student", characterId: "stu-lena", status: "Aktywna" },
-      { id: "acc-rossa", discordId: "100000000000000010", displayName: "Mira Rossa", avatarUrl: "", role: "Nauczyciel", characterType: "teacher", characterId: "tea-rossa", status: "Aktywna" },
+      { id: "acc-admin", discordId: "local-admin", displayName: "Administrator lokalny", avatarUrl: "", roles: ["Administrator"], characters: [], status: "Aktywna" },
+      { id: "acc-lena", discordId: "100000000000000001", displayName: "LenaRP", avatarUrl: "", roles: ["Uczeń", "Prefekt"], characters: [{ type: "student", id: "stu-lena" }, { type: "prefect", id: "pref-lena" }], status: "Aktywna" },
+      { id: "acc-rossa", discordId: "100000000000000010", displayName: "Mira Rossa", avatarUrl: "", roles: ["Nauczyciel"], characters: [{ type: "teacher", id: "tea-rossa" }], status: "Aktywna" },
     ],
     students: [
       { id: "stu-lena", name: "Lena Kowalska", accountId: "acc-lena", className: "II", houseId: "house-ivy", status: "Aktywna" },
@@ -78,9 +78,9 @@
       { id: "pref-lena", name: "Lena Kowalska", accountId: "acc-lena", studentId: "stu-lena", houseId: "house-ivy", isHead: true, status: "Aktywna" },
     ],
     grades: [
-      { id: "gr-1", studentId: "stu-lena", subject: "Eliksiry", teacherId: "tea-rossa", value: "5", weight: 2, description: "Odpowiedź ustna", date: "2026-07-01", isFinalYear: false },
-      { id: "gr-2", studentId: "stu-lena", subject: "Eliksiry", teacherId: "tea-rossa", value: "5+", weight: 4, description: "Ocena końcoworoczna", date: "2026-07-05", isFinalYear: true },
-      { id: "gr-3", studentId: "stu-maks", subject: "Zaklęcia", teacherId: "tea-novak", value: "4+", weight: 3, description: "Sprawdzian końcowy", date: "2026-07-02", isFinalYear: true },
+      { id: "gr-1", studentId: "stu-lena", subject: "Eliksiry", teacherId: "tea-rossa", value: "Z (5)", weight: 2, description: "Odpowiedź ustna", date: "2026-07-01", isFinalYear: false, isProposedFinalYear: false },
+      { id: "gr-2", studentId: "stu-lena", subject: "Eliksiry", teacherId: "tea-rossa", value: "I (6)", weight: 4, description: "Ocena końcoworoczna", date: "2026-07-05", isFinalYear: true, isProposedFinalYear: false },
+      { id: "gr-3", studentId: "stu-maks", subject: "Zaklęcia", teacherId: "tea-novak", value: "P (4)", weight: 3, description: "Sprawdzian końcowy", date: "2026-07-02", isFinalYear: true, isProposedFinalYear: false },
     ],
     attendance: [
       { id: "att-1", sessionId: "sess-1", studentId: "stu-lena", subject: "Eliksiry", teacherId: "tea-rossa", status: "Obecny", date: todayIso(), time: "18:00-19:00", years: ["II"] },
@@ -88,7 +88,7 @@
     ],
     schedule: [
       { id: "sch-1", date: todayIso(), weekStart: startOfWeekIso(new Date()), time: "18:00-19:00", years: ["II"], itemType: "subject", itemId: "Eliksiry", teacherId: "tea-rossa", room: "Pracownia eliksirów", title: "Wywar uspokajający" },
-      { id: "sch-2", date: addDaysIso(todayIso(), 2), weekStart: startOfWeekIso(new Date()), time: "19:00-20:00", years: ["I", "II"], itemType: "subject", itemId: "Zaklęcia", teacherId: "tea-novak", room: "Sala run", title: "Tarcze podstawowe" },
+      { id: "sch-2", date: addDaysIso(todayIso(), 2), weekStart: startOfWeekIso(new Date()), time: "19:00-20:00", years: ["I", "II"], itemType: "subject", itemId: "Zaklęcia", teacherId: "tea-novak", room: "Komnata run", title: "Tarcze podstawowe" },
     ],
     announcements: [
       { id: "ann-1", title: "Ceremonia przydziału", body: "Nowe postacie zostaną przydzielone do domów po lekcjach organizacyjnych.", audience: "Wszyscy", date: todayIso(), pinned: true },
@@ -208,12 +208,19 @@
     merged.workers = merged.workers.map((worker) => ({ ...worker, accountId: worker.accountId || "", position: worker.position || "Pracownik szkoły", status: normalizeStatus(worker.status) })).sort(compareByName);
     merged.prefects = merged.prefects.map((prefect) => ({ ...prefect, accountId: prefect.accountId || "", studentId: prefect.studentId || "", houseId: prefect.houseId || merged.houses[0]?.id || "", isHead: Boolean(prefect.isHead), status: normalizeStatus(prefect.status) })).sort(compareByName);
     merged.houses = merged.houses.map((house) => ({ ...house, crestDataUrl: house.crestDataUrl || "" }));
-    merged.grades = merged.grades.map((grade) => ({ ...grade, teacherId: grade.teacherId || "", description: grade.description || grade.title || grade.category || "", isFinalYear: Boolean(grade.isFinalYear || grade.kind === "finalYear") }));
+    merged.grades = merged.grades.map((grade) => ({ ...grade, teacherId: grade.teacherId || "", description: grade.description || grade.title || grade.category || "", isFinalYear: Boolean(grade.isFinalYear || grade.kind === "finalYear"), isProposedFinalYear: Boolean(grade.isProposedFinalYear || grade.kind === "proposedFinalYear") }));
     merged.attendance = merged.attendance.map((entry) => ({ ...entry, sessionId: entry.sessionId || uid("sess"), status: entry.status || "Nieobecny", date: entry.date || todayIso(), time: entry.time || "18:00-19:00", years: Array.isArray(entry.years) ? normalizeYears(entry.years) : [normalizeYear(entry.className || merged.students.find((student) => student.id === entry.studentId)?.className || merged.years[0])] }));
     merged.schedule = merged.schedule.map((lesson) => normalizeLesson(lesson, merged));
     merged.points = (Array.isArray(nextState.points) ? nextState.points : migrateNotes(nextState.notes || [])).map((point) => ({ ...point, authorId: point.authorId || point.teacherId || "", authorType: point.authorType || "teacher" }));
     merged.clubs = merged.clubs.map((club) => ({ ...club, crestDataUrl: club.crestDataUrl || "", fields: Array.isArray(club.fields) ? club.fields : [] }));
-    merged.accounts = merged.accounts.map((account) => ({ ...account, role: roles.includes(account.role) ? account.role : roleFromOld(account.role), characterType: account.characterType || "none", characterId: account.characterId || "", avatarUrl: account.avatarUrl || "", status: normalizeStatus(account.status) }));
+    merged.announcements = merged.announcements.map((announcement) => {
+      const audiences = normalizeAudiences(announcement.audiences || announcement.audience);
+      return { ...announcement, audiences, audience: audiences[0] || "Wszyscy" };
+    });
+    merged.accounts = merged.accounts.map((account) => {
+      const accountRoleList = normalizeRoles(account.roles || account.role);
+      return { ...account, roles: accountRoleList, role: accountRoleList[0] || "Uczeń", characters: normalizeCharacters(account.characters, account.characterType, account.characterId), characterType: "multi", characterId: "", avatarUrl: account.avatarUrl || "", status: normalizeStatus(account.status) };
+    });
     return merged;
   }
 
@@ -244,7 +251,7 @@
     if (!discordValue) return;
     const id = `acc-${String(characterId || uid("legacy")).replace(/[^a-z0-9-]/gi, "")}`;
     if (accounts.some((account) => account.id === id)) return;
-    accounts.push({ id, discordId: String(discordValue), displayName: String(discordValue).replace(/^@/, "") || displayName, avatarUrl: "", role, characterType, characterId, status: "Aktywna" });
+    accounts.push({ id, discordId: String(discordValue), displayName: String(discordValue).replace(/^@/, "") || displayName, avatarUrl: "", roles: [roleFromOld(role)], characters: characterId ? [{ type: characterType, id: characterId }] : [], status: "Aktywna" });
   }
 
   function accountFromLegacy(discordValue, accounts) {
@@ -265,6 +272,34 @@
     return "Uczeń";
   }
 
+  function normalizeRoles(value) {
+    const items = Array.isArray(value) ? value : [value];
+    const normalized = items.map(roleFromOld).filter((role) => roles.includes(role));
+    const unique = Array.from(new Set(normalized));
+    return unique.length ? unique : ["Uczeń"];
+  }
+
+  function normalizeCharacters(characters, legacyType, legacyId) {
+    const items = Array.isArray(characters) ? characters : [];
+    const normalized = items
+      .map((character) => ({ type: character?.type || character?.characterType || "", id: character?.id || character?.characterId || "" }))
+      .filter((character) => character.type && character.type !== "none" && character.id);
+    if (!normalized.length && legacyType && legacyType !== "none" && legacyId) normalized.push({ type: legacyType, id: legacyId });
+    const seen = new Set();
+    return normalized.filter((character) => {
+      const key = `${character.type}:${character.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function normalizeAudiences(value) {
+    const items = Array.isArray(value) ? value : [value || "Wszyscy"];
+    const unique = Array.from(new Set(items.map((item) => String(item || "").trim()).filter(Boolean)));
+    return unique.length ? unique : ["Wszyscy"];
+  }
+
   function normalizeYear(value) {
     const clean = String(value || "I").replace(/^Rok\s+/i, "").replace(/^Rocznik\s+/i, "").trim();
     return clean || "I";
@@ -276,6 +311,24 @@
 
   function displayYear(value) {
     return `Rocznik ${normalizeYear(value)}`;
+  }
+
+  function yearSortValue(value) {
+    const clean = normalizeYear(value).toUpperCase();
+    const roman = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9, X: 10 };
+    const numeric = Number(clean);
+    if (Number.isFinite(numeric) && clean !== "") return numeric;
+    return roman[clean] || Number.MAX_SAFE_INTEGER;
+  }
+
+  function formatYears(values) {
+    const normalized = normalizeYears(values).sort((a, b) => yearSortValue(a) - yearSortValue(b) || a.localeCompare(b, "pl", { numeric: true }));
+    if (!normalized.length) return "Brak roczników";
+    if (normalized.length === 1) return displayYear(normalized[0]);
+    const numbers = normalized.map(yearSortValue);
+    const consecutive = numbers.every((value) => Number.isFinite(value) && value !== Number.MAX_SAFE_INTEGER) && numbers.every((value, index) => index === 0 || value === numbers[index - 1] + 1);
+    if (consecutive) return `Roczniki ${normalized[0]}-${normalized[normalized.length - 1]}`;
+    return normalized.map(displayYear).join(", ");
   }
 
   function compareByName(a, b) {
@@ -290,10 +343,30 @@
     return state.accounts.find((account) => account.id === session.currentAccountId) || null;
   }
 
-  function roleKind(role = currentAccount()?.role) {
-    if (fullRoles.has(role)) return "full";
-    if (teacherRoles.has(role)) return "teacher";
-    if (pointsRoles.has(role)) return "points";
+  function accountRoles(account) {
+    return normalizeRoles(account?.roles || account?.role);
+  }
+
+  function accountCharacters(account) {
+    return normalizeCharacters(account?.characters, account?.characterType, account?.characterId);
+  }
+
+  function accountRoleLabel(account) {
+    return accountRoles(account).join(", ");
+  }
+
+  function accountHasRole(account, role) {
+    return accountRoles(account).includes(role);
+  }
+
+  function accountHasAnyRole(account, roleSet) {
+    return accountRoles(account).some((role) => roleSet.has(role));
+  }
+
+  function roleKind(account = currentAccount()) {
+    if (accountHasAnyRole(account, fullRoles)) return "full";
+    if (accountHasAnyRole(account, teacherRoles)) return "teacher";
+    if (accountHasAnyRole(account, pointsRoles)) return "points";
     return "student";
   }
 
@@ -304,10 +377,10 @@
   function canEditScope(scope) {
     const account = currentAccount();
     if (!account || account.status !== "Aktywna") return false;
-    if (scope === "clubs") return account.role === "Administrator";
-    if (scope === "points") return roleKind(account.role) === "full" || pointsRoles.has(account.role);
-    if (["grades", "attendance"].includes(scope)) return roleKind(account.role) === "full" || teacherRoles.has(account.role);
-    return roleKind(account.role) === "full";
+    if (scope === "clubs") return accountHasRole(account, "Administrator");
+    if (scope === "points") return roleKind(account) === "full" || accountHasAnyRole(account, pointsRoles);
+    if (["grades", "attendance"].includes(scope)) return roleKind(account) === "full" || accountHasAnyRole(account, teacherRoles);
+    return roleKind(account) === "full";
   }
 
   function canDeleteScope(scope) {
@@ -373,12 +446,22 @@
     return Array.from(select?.selectedOptions || []).map((item) => item.value).filter(Boolean);
   }
 
+  function selectedCheckboxValues(container) {
+    return $$('input[type="checkbox"]:checked', container || document).map((item) => item.value).filter(Boolean);
+  }
+
+  function renderCheckboxes(container, options, selectedValues = []) {
+    if (!container) return;
+    const selected = new Set((selectedValues || []).map(String));
+    container.innerHTML = options.length ? options.map((item) => `<label class="check-option"><input type="checkbox" value="${escapeHtml(item.value)}" ${selected.has(String(item.value)) ? "checked" : ""} /><span>${escapeHtml(item.label)}</span></label>`).join("") : `<span class="muted-text">Brak danych</span>`;
+  }
+
   function parseCommaList(value) {
     return value.split(",").map((item) => item.trim()).filter(Boolean);
   }
 
   function accountOptions(includeEmpty = true) {
-    const items = state.accounts.slice().sort((a, b) => a.displayName.localeCompare(b.displayName, "pl")).map((account) => option(account.id, `${account.displayName} · ${account.role}`));
+    const items = state.accounts.slice().sort((a, b) => a.displayName.localeCompare(b.displayName, "pl")).map((account) => option(account.id, `${account.displayName} · ${accountRoleLabel(account)}`));
     return includeEmpty ? [option("", "Nie przypisano")].concat(items) : items;
   }
 
@@ -424,6 +507,37 @@
     return [option("", "Brak postaci")];
   }
 
+  function characterValue(character) {
+    return `${character.type}:${character.id}`;
+  }
+
+  function parseCharacterValue(value) {
+    const [type, ...idParts] = String(value || "").split(":");
+    const id = idParts.join(":");
+    return type && id ? { type, id } : null;
+  }
+
+  function characterCheckboxOptions() {
+    return [
+      ...state.students.slice().sort(compareStudents).map((item) => option(`student:${item.id}`, `Uczeń: ${item.name} · ${displayYear(item.className)}`)),
+      ...state.teachers.slice().sort(compareByName).map((item) => option(`teacher:${item.id}`, `Nauczyciel: ${item.name}`)),
+      ...state.workers.slice().sort(compareByName).map((item) => option(`worker:${item.id}`, `Pracownik szkoły: ${item.name}`)),
+      ...state.prefects.slice().sort(compareByName).map((item) => option(`prefect:${item.id}`, `Prefekt: ${item.name}`)),
+    ];
+  }
+
+  function selectedAccountCharacters() {
+    return selectedCheckboxValues($("#accountCharacterId")).map(parseCharacterValue).filter(Boolean);
+  }
+
+  function characterName(character) {
+    if (character.type === "student") return getStudent(character.id)?.name || "Uczeń";
+    if (character.type === "teacher") return getTeacher(character.id)?.name || "Nauczyciel";
+    if (character.type === "worker") return getWorker(character.id)?.name || "Pracownik";
+    if (character.type === "prefect") return getPrefect(character.id)?.name || "Prefekt";
+    return "Postać";
+  }
+
   function accountAvatar(account) {
     if (!account) return `<span class="avatar avatar-empty">?</span>`;
     if (account.avatarUrl) return `<img class="avatar" src="${escapeHtml(account.avatarUrl)}" alt="" />`;
@@ -434,7 +548,7 @@
   function accountCard(accountId) {
     const account = getAccount(accountId);
     if (!account) return `<span class="muted-text">Nie przypisano</span>`;
-    return `<div class="account-mini">${accountAvatar(account)}<div><strong>${escapeHtml(account.displayName)}</strong><span>${escapeHtml(account.role)}</span></div></div>`;
+    return `<div class="account-mini">${accountAvatar(account)}<div><strong>${escapeHtml(account.displayName)}</strong><span>${escapeHtml(accountRoleLabel(account))}</span></div></div>`;
   }
 
   function statusBadge(status) {
@@ -464,7 +578,10 @@
   }
 
   function gradeToNumber(value) {
-    const match = String(value).match(/^([1-6])([+-])?$/);
+    const label = String(value || "");
+    const coded = label.match(/\(([1-6])\)/);
+    if (coded) return Number(coded[1]);
+    const match = label.match(/^([1-6])([+-])?$/);
     if (!match) return null;
     let number = Number(match[1]);
     if (match[2] === "+") number += 0.5;
@@ -552,11 +669,16 @@
     const displayName = profile.global_name || profile.username || profile.id;
     let account = state.accounts.find((item) => item.discordId === profile.id);
     if (!account) {
-      account = { id: uid("acc"), discordId: profile.id, displayName, avatarUrl, role: "Uczeń", characterType: "none", characterId: "", status: "Aktywna" };
+      account = { id: uid("acc"), discordId: profile.id, displayName, avatarUrl, roles: ["Uczeń"], role: "Uczeń", characters: [], characterType: "multi", characterId: "", status: "Aktywna" };
       state.accounts.push(account);
     } else {
       account.displayName = displayName;
       account.avatarUrl = avatarUrl || account.avatarUrl;
+      account.roles = normalizeRoles(account.roles || account.role);
+      account.role = account.roles[0] || "Uczeń";
+      account.characters = accountCharacters(account);
+      account.characterType = "multi";
+      account.characterId = "";
     }
     return account;
   }
@@ -568,9 +690,10 @@
     $("#appShell").classList.toggle("app-hidden", !loggedIn);
     $("#loginSchoolName").textContent = state.settings.schoolName;
     $("#loginBrandMark").innerHTML = state.settings.logoDataUrl ? `<img class="logo-image" src="${state.settings.logoDataUrl}" alt="" />` : "ED";
-    fillSelect($("#quickAccountSelect"), state.accounts.map((item) => option(item.id, `${item.displayName} · ${item.role}`)), session.currentAccountId || state.accounts[0]?.id);
+    fillSelect($("#quickAccountSelect"), state.accounts.map((item) => option(item.id, `${item.displayName} · ${accountRoleLabel(item)}`)), session.currentAccountId || state.accounts[0]?.id);
     $("#quickAccountSelect").closest("label").classList.toggle("permission-hidden", !state.settings.allowLocalLogin);
     $("#localLoginButton").classList.toggle("permission-hidden", !state.settings.allowLocalLogin);
+    $(".login-divider")?.classList.toggle("permission-hidden", !state.settings.allowLocalLogin);
     const hint = state.settings.discordClientId ? `Redirect URI: ${discordRedirectUri()}` : "Wpisz Client ID aplikacji Discord w zakładce Dane. Do konfiguracji użyj konta lokalnego administratora.";
     $("#discordLoginHint").textContent = hint;
     if (loggedIn) {
@@ -595,22 +718,26 @@
     renderLogoTargets();
     $("#sectionTitle").textContent = sectionTitles[activeSection] || "Panel";
 
-    fillSelect($("#accountRole"), roles.map((role) => option(role)), $("#accountRole")?.value || "Uczeń");
-    fillSelect($("#accountCharacterType"), characterTypeOptions(), $("#accountCharacterType")?.value || "none");
-    fillSelect($("#accountCharacterId"), characterOptions($("#accountCharacterType")?.value || "none"), $("#accountCharacterId")?.value || "");
-    fillSelect($("#accountStatus"), statusOptionsList(), $("#accountStatus")?.value || "Aktywna");
+    const editedAccount = getAccount($("#accountEditId")?.value || "");
+    const selectedAccountRoles = selectedCheckboxValues($("#accountRole"));
+    const selectedAccountCharacterValues = selectedCheckboxValues($("#accountCharacterId"));
+    renderCheckboxes($("#accountRole"), roles.map((role) => option(role)), editedAccount ? accountRoles(editedAccount) : (selectedAccountRoles.length ? selectedAccountRoles : ["Uczeń"]));
+    renderCheckboxes($("#accountCharacterId"), characterCheckboxOptions(), editedAccount ? accountCharacters(editedAccount).map(characterValue) : selectedAccountCharacterValues);
+    fillSelect($("#accountStatus"), statusOptionsList(), $("#accountStatus")?.value || editedAccount?.status || "Aktywna");
 
     for (const id of ["studentAccountId", "teacherAccountId", "workerAccountId", "prefectAccountId"]) fillSelect($(`#${id}`), accountOptions(true), $(`#${id}`)?.value || "");
     for (const id of ["studentStatus", "teacherStatus", "workerStatus", "prefectStatus"]) fillSelect($(`#${id}`), statusOptionsList(), $(`#${id}`)?.value || "Aktywna");
     for (const id of ["studentYear", "studentYearFilter", "gradeYearFilter", "attendanceYearFilter", "scheduleYearFilter"]) fillSelect($(`#${id}`), yearOptions(id.endsWith("Filter")), $(`#${id}`)?.value || (id.endsWith("Filter") ? "Wszystkie" : state.years[0]));
     for (const id of ["studentHouse", "prefectHouse", "studentHouseFilter", "gradeHouseFilter"]) fillSelect($(`#${id}`), houseOptions(id.endsWith("Filter")), $(`#${id}`)?.value || (id.endsWith("Filter") ? "Wszystkie" : state.houses[0]?.id));
     fillSelect($("#prefectStudentId"), studentOptions(true), $("#prefectStudentId")?.value || "");
-    fillMultiSelect($("#teacherSubjects"), allSubjects().map((subject) => option(subject)), selectedValues($("#teacherSubjects")));
+    const editedTeacher = getTeacher($("#teacherEditId")?.value || "");
+    const selectedTeacherSubjects = selectedCheckboxValues($("#teacherSubjects"));
+    renderCheckboxes($("#teacherSubjects"), allSubjects().map((subject) => option(subject)), editedTeacher ? (editedTeacher.subjects || []) : selectedTeacherSubjects);
 
     fillSelect($("#gradeSubjectFilter"), subjectOptions(true), $("#gradeSubjectFilter")?.value || "Wszystkie");
     fillSelect($("#gradeSubject"), subjectOptions(false, true), $("#gradeSubject")?.value || "");
     syncTeacherSelectForSubject("#gradeSubject", "#gradeTeacher");
-    fillSelect($("#gradeKind"), [option("regular", "Cząstkowa"), option("finalYear", "Końcoworoczna")], $("#gradeKind")?.value || "regular");
+    fillSelect($("#gradeKind"), [option("regular", "Cząstkowa"), option("proposedFinalYear", "Proponowana końcoworoczna"), option("finalYear", "Końcoworoczna")], $("#gradeKind")?.value || "regular");
 
     fillMultiSelect($("#attendanceYears"), yearOptions(false), selectedValues($("#attendanceYears")).length ? selectedValues($("#attendanceYears")) : [state.years[0]]);
     updateAutoDayLabels();
@@ -624,11 +751,15 @@
     syncScheduleItems();
     syncScheduleTeacher();
 
-    fillSelect($("#announcementAudience"), [option("Wszyscy"), option("Kadra"), ...yearOptions(false)], $("#announcementAudience")?.value || "Wszyscy");
-    fillSelect($("#pointStudent"), studentOptions(false), $("#pointStudent")?.value || state.students[0]?.id);
+    const editedAnnouncement = state.announcements.find((announcement) => announcement.id === ($("#announcementEditId")?.value || ""));
+    const selectedAnnouncementAudiences = selectedCheckboxValues($("#announcementAudience"));
+    renderCheckboxes($("#announcementAudience"), announcementAudienceOptions(), editedAnnouncement ? normalizeAudiences(editedAnnouncement.audiences || editedAnnouncement.audience) : (selectedAnnouncementAudiences.length ? selectedAnnouncementAudiences : ["Wszyscy"]));
+    const editedPoint = state.points.find((point) => point.id === ($("#pointEditId")?.value || ""));
+    const selectedPointStudents = selectedCheckboxValues($("#pointStudent"));
+    renderCheckboxes($("#pointStudent"), studentOptions(false), editedPoint ? [editedPoint.studentId] : (selectedPointStudents.length ? selectedPointStudents : (state.students[0]?.id ? [state.students[0].id] : [])));
     fillSelect($("#pointAuthor"), authorOptions(), $("#pointAuthor")?.value || authorOptions()[0]?.value || "");
 
-    fillSelect($("#clubFieldType"), [option("teacher", "Wybór nauczyciela"), option("students", "Wybór uczniów"), option("studentRoles", "Uczniowie z rolami"), option("text", "Tekst"), option("details", "Wysuwana wiadomość")], $("#clubFieldType")?.value || "teacher");
+    fillSelect($("#clubFieldType"), [option("teacher", "Wybór nauczyciela"), option("teachers", "Wybór wielu nauczycieli"), option("students", "Wybór uczniów"), option("studentRoles", "Uczniowie z rolami"), option("text", "Tekst"), option("details", "Wysuwana wiadomość")], $("#clubFieldType")?.value || "teacher");
 
     const today = todayIso();
     for (const id of ["gradeDate", "attendanceDate", "attendanceDateFilter", "scheduleDate", "announcementDate", "pointDate"]) {
@@ -702,11 +833,23 @@
     fillSelect($("#attendanceSubject"), subjects.length ? subjects.map((subject) => option(subject)) : [option("", "Brak przedmiotów w planie")], $("#attendanceSubject")?.value || subjects[0] || "");
   }
 
+  function announcementAudienceOptions() {
+    return [option("Wszyscy"), option("Kadra"), option("Prefekci"), option("Pracownicy szkoły"), option("Praktykanci"), ...yearOptions(false)];
+  }
+
   function authorOptions() {
-    const teachers = state.teachers.map((teacher) => option(`teacher:${teacher.id}`, `Nauczyciel: ${teacher.name}`));
-    const workers = state.workers.map((worker) => option(`worker:${worker.id}`, `Pracownik: ${worker.name}`));
-    const prefects = state.prefects.map((prefect) => option(`prefect:${prefect.id}`, `Prefekt: ${prefect.name}`));
-    return teachers.concat(workers, prefects);
+    const entries = [
+      ...state.teachers.map((teacher) => ({ value: `teacher:${teacher.id}`, label: teacher.name, accountId: teacher.accountId, name: teacher.name })),
+      ...state.workers.map((worker) => ({ value: `worker:${worker.id}`, label: worker.name, accountId: worker.accountId, name: worker.name })),
+      ...state.prefects.map((prefect) => ({ value: `prefect:${prefect.id}`, label: prefect.name, accountId: prefect.accountId, name: prefect.name })),
+    ];
+    const seen = new Set();
+    return entries.filter((entry) => {
+      const key = entry.accountId ? `account:${entry.accountId}` : `name:${String(entry.name || "").trim().toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).map((entry) => option(entry.value, entry.label));
   }
 
   function updatePermissions() {
@@ -754,13 +897,10 @@
   }
 
   function renderDashboard() {
-    const attendance = state.attendance;
-    const absent = attendance.filter((entry) => entry.status === "Nieobecny").length;
-    const attendanceRate = attendance.length ? Math.round(((attendance.length - absent) / attendance.length) * 100) : 0;
     $("#metricStudents").textContent = state.students.length;
-    $("#metricAccounts").textContent = state.accounts.length;
-    $("#metricAttendance").textContent = `${attendanceRate}%`;
-    $("#metricHousePoints").textContent = state.houses.reduce((sum, house) => sum + pointsForHouse(house.id), 0);
+    $("#metricAccounts").textContent = state.teachers.length;
+    $("#metricAttendance").textContent = state.accounts.filter((account) => accountHasRole(account, "Praktykant")).length;
+    $("#metricHousePoints").textContent = state.workers.length;
     $("#dashboardWeek").textContent = `od ${formatDate(currentWeekStart())}`;
     const lessons = state.schedule.filter((lesson) => lesson.weekStart === currentWeekStart()).sort(compareLessons).slice(0, 6);
     $("#dashboardLessons").innerHTML = lessons.length ? lessons.map(renderLessonMini).join("") : `<div class="empty-state">Brak zajęć w tym tygodniu.</div>`;
@@ -769,7 +909,7 @@
 
   function renderLessonMini(lesson) {
     const teacher = getTeacher(lesson.teacherId);
-    return `<article class="list-item"><div class="list-row"><strong>${escapeHtml(dayName(lesson.date))} · ${escapeHtml(lesson.time)} · ${escapeHtml(scheduleItemLabel(lesson))}</strong><span class="pill">${lesson.years.map(displayYear).join(", ")}</span></div><span class="muted-text">${escapeHtml(lesson.room || "Brak miejsca")} · ${escapeHtml(teacher?.name || "bez opiekuna")}</span></article>`;
+    return `<article class="list-item"><div class="list-row"><strong>${escapeHtml(dayName(lesson.date))} · ${escapeHtml(lesson.time)} · ${escapeHtml(scheduleItemLabel(lesson))}</strong><span class="pill">${escapeHtml(formatYears(lesson.years))}</span></div><span class="muted-text">${escapeHtml(lesson.room || "Brak miejsca")} · ${escapeHtml(teacher?.name || "bez opiekuna")}</span></article>`;
   }
 
   function renderHouseScoreboard() {
@@ -779,15 +919,12 @@
 
   function renderAccounts() {
     const rows = state.accounts.slice().sort((a, b) => a.displayName.localeCompare(b.displayName, "pl"));
-    $("#accountsTable").innerHTML = rows.length ? rows.map((account) => `<tr><td>${accountCard(account.id)}</td><td>${escapeHtml(account.role)}</td><td>${escapeHtml(characterLabel(account))}</td><td>${statusBadge(account.status)}</td><td class="item-actions"><button class="secondary-button" data-action="edit-account" data-id="${escapeHtml(account.id)}">Edytuj</button><button class="ghost-button" data-action="delete-account" data-delete-scope="accounts" data-id="${escapeHtml(account.id)}">Usuń</button></td></tr>`).join("") : `<tr><td colspan="5">Brak kont.</td></tr>`;
+    $("#accountsTable").innerHTML = rows.length ? rows.map((account) => `<tr><td>${accountCard(account.id)}</td><td>${escapeHtml(accountRoleLabel(account))}</td><td>${escapeHtml(characterLabel(account))}</td><td>${statusBadge(account.status)}</td><td class="item-actions"><button class="secondary-button" data-action="edit-account" data-id="${escapeHtml(account.id)}">Edytuj</button><button class="ghost-button" data-action="delete-account" data-delete-scope="accounts" data-id="${escapeHtml(account.id)}">Usuń</button></td></tr>`).join("") : `<tr><td colspan="5">Brak kont.</td></tr>`;
   }
 
   function characterLabel(account) {
-    if (account.characterType === "student") return getStudent(account.characterId)?.name || "Uczeń";
-    if (account.characterType === "teacher") return getTeacher(account.characterId)?.name || "Nauczyciel";
-    if (account.characterType === "worker") return getWorker(account.characterId)?.name || "Pracownik";
-    if (account.characterType === "prefect") return getPrefect(account.characterId)?.name || "Prefekt";
-    return "Brak";
+    const labels = accountCharacters(account).map(characterName);
+    return labels.length ? labels.join(", ") : "Brak";
   }
 
   function renderStudents() {
@@ -821,7 +958,7 @@
 
   function renderPrefects() {
     const rows = state.prefects.slice().sort(compareByName);
-    $("#prefectsTable").innerHTML = rows.length ? rows.map((prefect) => `<tr><td><strong>${escapeHtml(prefect.name)}</strong></td><td>${accountCard(prefect.accountId)}</td><td>${escapeHtml(getStudent(prefect.studentId)?.name || "-")}</td><td>${houseChip(getHouse(prefect.houseId))}</td><td>${prefect.isHead ? "Prefekt naczelny" : "Prefekt domu"}</td><td>${statusBadge(prefect.status)}</td><td class="item-actions"><button class="secondary-button" data-action="edit-prefect" data-id="${escapeHtml(prefect.id)}">Edytuj</button><button class="ghost-button" data-action="delete-prefect" data-delete-scope="prefects" data-id="${escapeHtml(prefect.id)}">Usuń</button></td></tr>`).join("") : `<tr><td colspan="7">Brak prefektów.</td></tr>`;
+    $("#prefectsTable").innerHTML = rows.length ? rows.map((prefect) => `<tr><td><strong>${escapeHtml(getStudent(prefect.studentId)?.name || prefect.name || "-")}</strong></td><td>${accountCard(prefect.accountId)}</td><td>${houseChip(getHouse(prefect.houseId))}</td><td>${prefect.isHead ? "Prefekt naczelny" : "Prefekt domu"}</td><td>${statusBadge(prefect.status)}</td><td class="item-actions"><button class="secondary-button" data-action="edit-prefect" data-id="${escapeHtml(prefect.id)}">Edytuj</button><button class="ghost-button" data-action="delete-prefect" data-delete-scope="prefects" data-id="${escapeHtml(prefect.id)}">Usuń</button></td></tr>`).join("") : `<tr><td colspan="6">Brak prefektów.</td></tr>`;
   }
 
   function renderHouses() {
@@ -838,7 +975,8 @@
   function gradeChip(grade) {
     const number = gradeToNumber(grade.value);
     const tone = number >= 4.75 ? "strong" : number <= 2 ? "weak" : "";
-    return `<span class="grade-chip ${tone}">${escapeHtml(grade.value)}${grade.isFinalYear ? " K" : ""}</span>`;
+    const suffix = grade.isFinalYear ? " K" : grade.isProposedFinalYear ? " PROP" : "";
+    return `<span class="grade-chip ${tone}">${escapeHtml(grade.value)}${suffix}</span>`;
   }
 
   function renderGrades() {
@@ -849,8 +987,18 @@
     $("#gradebookTable").innerHTML = students.length ? students.map((student) => {
       const grades = state.grades.filter((grade) => grade.studentId === student.id && (subject === "Wszystkie" || grade.subject === subject)).sort((a, b) => String(b.date).localeCompare(String(a.date)));
       const finalAverage = weightedAverage(grades.filter((grade) => grade.isFinalYear));
-      return `<tr><td><strong>${escapeHtml(student.name)}</strong></td><td>${displayYear(student.className)}</td><td>${houseChip(getHouse(student.houseId))}</td><td><strong>${finalAverage === null ? "-" : finalAverage.toFixed(2)}</strong></td><td><details class="grade-details"><summary>${grades.length} wpisów</summary>${grades.length ? `<div class="grade-list-inline">${grades.map(renderGradeDetail).join("")}</div>` : `<span class="muted-text">Brak ocen</span>`}</details></td></tr>`;
+      return `<tr><td><strong>${escapeHtml(student.name)}</strong></td><td>${displayYear(student.className)}</td><td>${houseChip(getHouse(student.houseId))}</td><td><strong>${finalAverage === null ? "-" : finalAverage.toFixed(2)}</strong></td><td><details class="grade-details"><summary>${grades.length} wpisów</summary>${renderStudentSubjectGrades(grades)}</details></td></tr>`;
     }).join("") : `<tr><td colspan="5">Brak uczniów dla wybranych filtrów.</td></tr>`;
+  }
+
+  function renderStudentSubjectGrades(grades) {
+    if (!grades.length) return `<span class="muted-text">Brak ocen</span>`;
+    const subjects = Array.from(new Set(grades.map((grade) => grade.subject || "Bez przedmiotu"))).sort((a, b) => a.localeCompare(b, "pl"));
+    return `<div class="grade-list-inline">${subjects.map((subject) => {
+      const subjectGrades = grades.filter((grade) => (grade.subject || "Bez przedmiotu") === subject);
+      const average = weightedAverage(subjectGrades);
+      return `<details class="subject-grade-details" open><summary>${escapeHtml(subject)} · średnia ${average === null ? "-" : average.toFixed(2)}</summary>${subjectGrades.map(renderGradeDetail).join("")}</details>`;
+    }).join("")}</div>`;
   }
 
   function renderGradeDetail(grade) {
@@ -898,7 +1046,7 @@
   function renderAttendanceSession(sessionItem) {
     const teacher = getTeacher(sessionItem.teacherId);
     const counts = sessionItem.entries.reduce((map, entry) => { map[entry.status] = (map[entry.status] || 0) + 1; return map; }, {});
-    return `<article class="list-item"><div class="list-row"><strong>${escapeHtml(dayName(sessionItem.date))} · ${escapeHtml(sessionItem.time)} · ${escapeHtml(sessionItem.subject)}</strong><span class="pill">${formatDate(sessionItem.date)}</span></div><span class="muted-text">${escapeHtml(teacher?.name || "bez nauczyciela")} · ${sessionItem.years.map(displayYear).join(", ")}</span><div>${attendanceBadge("Obecny")} ${counts.Obecny || 0} ${attendanceBadge("Spóźnienie")} ${counts.Spóźnienie || 0} ${attendanceBadge("Nieobecny")} ${counts.Nieobecny || 0}</div><div class="item-actions"><button class="secondary-button" data-action="edit-attendance" data-id="${escapeHtml(sessionItem.sessionId)}">Edytuj</button><button class="ghost-button" data-action="delete-attendance-session" data-delete-scope="attendance" data-id="${escapeHtml(sessionItem.sessionId)}">Usuń</button></div></article>`;
+    return `<article class="list-item"><div class="list-row"><strong>${escapeHtml(dayName(sessionItem.date))} · ${escapeHtml(sessionItem.time)} · ${escapeHtml(sessionItem.subject)}</strong><span class="pill">${formatDate(sessionItem.date)}</span></div><span class="muted-text">${escapeHtml(teacher?.name || "bez nauczyciela")} · ${escapeHtml(formatYears(sessionItem.years))}</span><div>${attendanceBadge("Obecny")} ${counts.Obecny || 0} ${attendanceBadge("Spóźnienie")} ${counts.Spóźnienie || 0} ${attendanceBadge("Nieobecny")} ${counts.Nieobecny || 0}</div><div class="item-actions"><button class="secondary-button" data-action="edit-attendance" data-id="${escapeHtml(sessionItem.sessionId)}">Edytuj</button><button class="ghost-button" data-action="delete-attendance-session" data-delete-scope="attendance" data-id="${escapeHtml(sessionItem.sessionId)}">Usuń</button></div></article>`;
   }
 
   function compareLessons(a, b) {
@@ -917,7 +1065,7 @@
 
   function renderScheduleLesson(lesson) {
     const teacher = getTeacher(lesson.teacherId);
-    return `<article class="lesson-card"><div class="list-row"><strong>${escapeHtml(lesson.time)} · ${escapeHtml(scheduleItemLabel(lesson))}</strong><button class="secondary-button" data-action="edit-schedule" data-id="${escapeHtml(lesson.id)}">Edytuj</button></div><span class="muted-text">${lesson.years.map(displayYear).join(", ")} · ${escapeHtml(lesson.room || "Brak miejsca")}</span><span>${escapeHtml(teacher?.name || "bez opiekuna")}</span>${lesson.title ? `<span class="muted-text">${escapeHtml(lesson.title)}</span>` : ""}<div class="item-actions"><button class="ghost-button" data-action="delete-schedule" data-delete-scope="schedule" data-id="${escapeHtml(lesson.id)}">Usuń</button></div></article>`;
+    return `<article class="lesson-card"><div class="list-row"><strong>${escapeHtml(lesson.time)} · ${escapeHtml(scheduleItemLabel(lesson))}</strong><button class="secondary-button" data-action="edit-schedule" data-id="${escapeHtml(lesson.id)}">Edytuj</button></div><span class="muted-text">${escapeHtml(formatYears(lesson.years))} · ${escapeHtml(lesson.room || "Brak miejsca")}</span><span>${escapeHtml(teacher?.name || "bez opiekuna")}</span>${lesson.title ? `<span class="muted-text">${escapeHtml(lesson.title)}</span>` : ""}<div class="item-actions"><button class="ghost-button" data-action="delete-schedule" data-delete-scope="schedule" data-id="${escapeHtml(lesson.id)}">Usuń</button></div></article>`;
   }
 
   function renderClubDraft() {
@@ -926,13 +1074,14 @@
   }
 
   function fieldTypeLabel(type) {
-    return { teacher: "Wybór nauczyciela", students: "Wybór uczniów", studentRoles: "Uczniowie z rolami", text: "Tekst", details: "Wysuwana wiadomość" }[type] || type;
+    return { teacher: "Wybór nauczyciela", teachers: "Wybór wielu nauczycieli", students: "Wybór uczniów", studentRoles: "Uczniowie z rolami", text: "Tekst", details: "Wysuwana wiadomość" }[type] || type;
   }
 
   function renderClubDynamicInput(field) {
     const label = escapeHtml(field.label);
     if (field.type === "teacher") return `<label class="field" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><select data-club-value>${state.teachers.map((teacher) => `<option value="${escapeHtml(teacher.id)}" ${field.value === teacher.id ? "selected" : ""}>${escapeHtml(teacher.name)}</option>`).join("")}</select></label>`;
-    if (field.type === "students") return `<label class="field wide" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><select class="multi-select" multiple data-club-value>${state.students.map((student) => `<option value="${escapeHtml(student.id)}" ${(field.value || []).includes(student.id) ? "selected" : ""}>${escapeHtml(student.name)} · ${displayYear(student.className)}</option>`).join("")}</select></label>`;
+    if (field.type === "teachers") return `<div class="field wide" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><div class="checkbox-grid tall" data-club-value>${state.teachers.map((teacher) => `<label class="check-option"><input type="checkbox" value="${escapeHtml(teacher.id)}" ${(field.value || []).includes(teacher.id) ? "checked" : ""} /><span>${escapeHtml(teacher.name)}</span></label>`).join("") || `<span class="muted-text">Brak nauczycieli</span>`}</div></div>`;
+    if (field.type === "students") return `<div class="field wide" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><div class="checkbox-grid tall" data-club-value>${state.students.map((student) => `<label class="check-option"><input type="checkbox" value="${escapeHtml(student.id)}" ${(field.value || []).includes(student.id) ? "checked" : ""} /><span>${escapeHtml(student.name)} · ${displayYear(student.className)}</span></label>`).join("") || `<span class="muted-text">Brak uczniów</span>`}</div></div>`;
     if (field.type === "studentRoles") return `<label class="field wide" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><textarea data-club-value rows="3" placeholder="np. Lena Kowalska - Lider">${escapeHtml(field.value || "")}</textarea></label>`;
     if (field.type === "details") return `<label class="field wide" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><textarea data-club-value rows="4">${escapeHtml(field.value || "")}</textarea></label>`;
     return `<label class="field wide" data-club-field="${escapeHtml(field.id)}"><span>${label}</span><input data-club-value value="${escapeHtml(field.value || "")}" /></label>`;
@@ -943,7 +1092,7 @@
       const wrapper = $(`[data-club-field="${field.id}"]`);
       const input = $("[data-club-value]", wrapper);
       let value = input?.value || "";
-      if (field.type === "students") value = selectedValues(input);
+      if (["students", "teachers"].includes(field.type)) value = selectedCheckboxValues(input);
       return { ...field, value };
     });
   }
@@ -959,6 +1108,7 @@
 
   function renderClubField(field) {
     if (field.type === "teacher") return `<div><strong>${escapeHtml(field.label)}:</strong> ${escapeHtml(getTeacher(field.value)?.name || "Nie wybrano")}</div>`;
+    if (field.type === "teachers") return `<div><strong>${escapeHtml(field.label)}:</strong> ${(field.value || []).map((id) => escapeHtml(getTeacher(id)?.name || "Nauczyciel")).join(", ") || "Brak"}</div>`;
     if (field.type === "students") return `<div><strong>${escapeHtml(field.label)}:</strong> ${(field.value || []).map((id) => escapeHtml(getStudent(id)?.name || "Uczeń")).join(", ") || "Brak"}</div>`;
     if (field.type === "details") return `<details><summary>${escapeHtml(field.label)}</summary><p>${escapeHtml(field.value || "")}</p></details>`;
     return `<div><strong>${escapeHtml(field.label)}:</strong> ${escapeHtml(field.value || "-")}</div>`;
@@ -966,7 +1116,7 @@
 
   function renderAnnouncements() {
     const rows = state.announcements.slice().sort((a, b) => (a.pinned === b.pinned ? String(b.date).localeCompare(String(a.date)) : a.pinned ? -1 : 1));
-    $("#announcementList").innerHTML = rows.length ? rows.map((announcement) => `<article class="announcement-item"><div class="list-row"><h3>${escapeHtml(announcement.title)}</h3><span class="pill">${escapeHtml(announcement.audience)}</span></div><p>${escapeHtml(announcement.body)}</p><div class="list-row"><span class="muted-text">${formatDate(announcement.date)}${announcement.pinned ? " · przypięte" : ""}</span><div class="item-actions"><button class="secondary-button" data-action="edit-announcement" data-id="${escapeHtml(announcement.id)}">Edytuj</button><button class="ghost-button" data-action="delete-announcement" data-delete-scope="announcements" data-id="${escapeHtml(announcement.id)}">Usuń</button></div></div></article>`).join("") : `<div class="empty-state">Brak ogłoszeń.</div>`;
+    $("#announcementList").innerHTML = rows.length ? rows.map((announcement) => `<article class="announcement-item"><div class="list-row"><h3>${escapeHtml(announcement.title)}</h3><span class="pill">${escapeHtml(normalizeAudiences(announcement.audiences || announcement.audience).join(", "))}</span></div><p>${escapeHtml(announcement.body)}</p><div class="list-row"><span class="muted-text">${formatDate(announcement.date)}${announcement.pinned ? " · przypięte" : ""}</span><div class="item-actions"><button class="secondary-button" data-action="edit-announcement" data-id="${escapeHtml(announcement.id)}">Edytuj</button><button class="ghost-button" data-action="delete-announcement" data-delete-scope="announcements" data-id="${escapeHtml(announcement.id)}">Usuń</button></div></div></article>`).join("") : `<div class="empty-state">Brak ogłoszeń.</div>`;
   }
 
   function renderPoints() {
@@ -994,7 +1144,10 @@
 
   function resetForm(formId, editId) {
     const form = $(formId);
-    if (form) form.reset();
+    if (form) {
+      form.reset();
+      $$(".checkbox-grid input", form).forEach((input) => { input.checked = false; });
+    }
     if ($(editId)) $(editId).value = "";
     pendingHouseCrest = "";
     pendingClubCrest = "";
@@ -1004,8 +1157,32 @@
   function readFile(input, callback) {
     const file = input.files?.[0];
     if (!file) return;
+    if (!file.type.startsWith("image/")) return showToast("Wybierz plik graficzny.");
     const reader = new FileReader();
-    reader.onload = () => callback(String(reader.result || ""));
+    reader.onload = () => {
+      const rawDataUrl = String(reader.result || "");
+      if (typeof Image === "undefined") {
+        callback(rawDataUrl);
+        return;
+      }
+      const image = new Image();
+      image.onload = () => {
+        const maxSize = 512;
+        const scale = Math.min(1, maxSize / Math.max(image.width || maxSize, image.height || maxSize));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round((image.width || maxSize) * scale));
+        canvas.height = Math.max(1, Math.round((image.height || maxSize) * scale));
+        const context = canvas.getContext("2d");
+        if (!context) {
+          callback(rawDataUrl);
+          return;
+        }
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL("image/webp", 0.82));
+      };
+      image.onerror = () => callback(rawDataUrl);
+      image.src = rawDataUrl;
+    };
     reader.readAsDataURL(file);
   }
 
@@ -1057,7 +1234,8 @@
     $("#addClubField").addEventListener("click", () => {
       const label = $("#clubFieldLabel").value.trim();
       if (!label) return showToast("Wpisz nazwę pola klubu.");
-      clubDraftFields.push({ id: uid("field"), label, type: $("#clubFieldType").value, value: $("#clubFieldType").value === "students" ? [] : "" });
+      const type = $("#clubFieldType").value;
+      clubDraftFields.push({ id: uid("field"), label, type, value: ["students", "teachers"].includes(type) ? [] : "" });
       $("#clubFieldLabel").value = "";
       renderClubDraft();
     });
@@ -1091,7 +1269,9 @@
       event.preventDefault();
       if (!canEditScope("accounts")) return;
       const editId = $("#accountEditId").value;
-      upsertById(state.accounts, { id: editId || uid("acc"), discordId: $("#accountDiscordId").value.trim(), displayName: $("#accountDisplayName").value.trim(), avatarUrl: $("#accountAvatarUrl").value.trim(), role: $("#accountRole").value, characterType: $("#accountCharacterType").value, characterId: $("#accountCharacterId").value, status: $("#accountStatus").value }, editId);
+      const accountRoleList = selectedCheckboxValues($("#accountRole"));
+      const rolesForAccount = accountRoleList.length ? accountRoleList : ["Uczeń"];
+      upsertById(state.accounts, { id: editId || uid("acc"), discordId: $("#accountDiscordId").value.trim(), displayName: $("#accountDisplayName").value.trim(), avatarUrl: $("#accountAvatarUrl").value.trim(), roles: rolesForAccount, role: rolesForAccount[0], characters: selectedAccountCharacters(), characterType: "multi", characterId: "", status: $("#accountStatus").value }, editId);
       saveState();
       resetForm("#accountForm", "#accountEditId");
       showToast("Zapisano konto.");
@@ -1114,7 +1294,7 @@
       event.preventDefault();
       if (!canEditScope("teachers")) return;
       const editId = $("#teacherEditId").value;
-      const item = { id: editId || uid("tea"), name: $("#teacherName").value.trim(), accountId: $("#teacherAccountId").value, position: $("#teacherPosition").value.trim(), subjects: selectedValues($("#teacherSubjects")), status: $("#teacherStatus").value };
+      const item = { id: editId || uid("tea"), name: $("#teacherName").value.trim(), accountId: $("#teacherAccountId").value, position: $("#teacherPosition").value.trim(), subjects: selectedCheckboxValues($("#teacherSubjects")), status: $("#teacherStatus").value };
       upsertById(state.teachers, item, editId);
       linkAccountCharacter(item.accountId, "teacher", item.id);
       state.teachers.sort(compareByName);
@@ -1167,7 +1347,7 @@
       if (!$("#gradeSubject").value || !$("#gradeTeacher").value) return showToast("Wybierz przedmiot i nauczyciela.");
       const rows = $$(".batch-row", $("#gradeBatchRows")).filter((row) => $("[data-grade-enabled]", row).checked);
       if (!rows.length) return showToast("Zaznacz przynajmniej jednego ucznia.");
-      rows.forEach((row) => state.grades.push({ id: uid("gr"), studentId: row.dataset.studentId, subject: $("#gradeSubject").value, teacherId: $("#gradeTeacher").value, value: $("[data-grade-value]", row).value, weight: Number($("[data-grade-weight]", row).value) || 1, description: $("#gradeDescription").value.trim(), date: $("#gradeDate").value || todayIso(), isFinalYear: $("#gradeKind").value === "finalYear" }));
+      rows.forEach((row) => state.grades.push({ id: uid("gr"), studentId: row.dataset.studentId, subject: $("#gradeSubject").value, teacherId: $("#gradeTeacher").value, value: $("[data-grade-value]", row).value, weight: Number($("[data-grade-weight]", row).value) || 1, description: $("#gradeDescription").value.trim(), date: $("#gradeDate").value || todayIso(), isFinalYear: $("#gradeKind").value === "finalYear", isProposedFinalYear: $("#gradeKind").value === "proposedFinalYear" }));
       saveState();
       $("#gradeDescription").value = "";
       render();
@@ -1222,7 +1402,9 @@
       event.preventDefault();
       if (!canEditScope("announcements")) return;
       const editId = $("#announcementEditId").value;
-      const item = { id: editId || uid("ann"), title: $("#announcementTitle").value.trim(), audience: $("#announcementAudience").value, date: $("#announcementDate").value || todayIso(), pinned: $("#announcementPinned").checked, body: $("#announcementBody").value.trim() };
+      const audiences = selectedCheckboxValues($("#announcementAudience"));
+      const normalizedAudiences = audiences.length ? audiences : ["Wszyscy"];
+      const item = { id: editId || uid("ann"), title: $("#announcementTitle").value.trim(), audiences: normalizedAudiences, audience: normalizedAudiences[0], date: $("#announcementDate").value || todayIso(), pinned: $("#announcementPinned").checked, body: $("#announcementBody").value.trim() };
       upsertById(state.announcements, item, editId);
       saveState();
       resetForm("#announcementForm", "#announcementEditId");
@@ -1234,8 +1416,14 @@
       if (!canEditScope("points")) return;
       const editId = $("#pointEditId").value;
       const [authorType, authorId] = String($("#pointAuthor").value || "teacher:").split(":");
-      const item = { id: editId || uid("pt"), studentId: $("#pointStudent").value, type: $("#pointType").value, value: Number($("#pointValue").value) || 0, authorType, authorId, category: $("#pointCategory").value.trim(), body: $("#pointBody").value.trim(), date: $("#pointDate").value || todayIso() };
-      upsertById(state.points, item, editId);
+      const studentIds = selectedCheckboxValues($("#pointStudent"));
+      if (!studentIds.length) return showToast("Zaznacz przynajmniej jedną osobę.");
+      const baseItem = { type: $("#pointType").value, value: Number($("#pointValue").value) || 0, authorType, authorId, category: $("#pointCategory").value.trim(), body: $("#pointBody").value.trim(), date: $("#pointDate").value || todayIso() };
+      if (editId) {
+        upsertById(state.points, { ...baseItem, id: editId, studentId: studentIds[0] }, editId);
+      } else {
+        studentIds.forEach((studentId) => state.points.push({ ...baseItem, id: uid("pt"), studentId }));
+      }
       saveState();
       resetForm("#pointForm", "#pointEditId");
       showToast("Zapisano punkty lub uwagę.");
@@ -1295,11 +1483,14 @@
   }
 
   function linkAccountCharacter(accountId, type, id) {
-    if (!accountId) return;
+    if (!accountId || !type || !id) return;
     const account = getAccount(accountId);
     if (!account) return;
-    account.characterType = type;
-    account.characterId = id;
+    account.roles = normalizeRoles(account.roles || account.role);
+    account.characters = accountCharacters(account);
+    if (!account.characters.some((character) => character.type === type && character.id === id)) account.characters.push({ type, id });
+    account.characterType = "multi";
+    account.characterId = "";
   }
 
   function lessonTimeForAttendance() {
@@ -1382,9 +1573,8 @@
     $("#accountDiscordId").value = account.discordId;
     $("#accountDisplayName").value = account.displayName;
     $("#accountAvatarUrl").value = account.avatarUrl || "";
-    $("#accountRole").value = account.role;
-    $("#accountCharacterType").value = account.characterType;
-    fillSelect($("#accountCharacterId"), characterOptions(account.characterType), account.characterId);
+    renderCheckboxes($("#accountRole"), roles.map((role) => option(role)), accountRoles(account));
+    renderCheckboxes($("#accountCharacterId"), characterCheckboxOptions(), accountCharacters(account).map(characterValue));
     $("#accountStatus").value = account.status;
     setActiveSection("accounts");
   }
@@ -1409,7 +1599,7 @@
     $("#teacherAccountId").value = item.accountId || "";
     $("#teacherPosition").value = item.position || "";
     $("#teacherStatus").value = item.status;
-    fillMultiSelect($("#teacherSubjects"), allSubjects().map((subject) => option(subject)), item.subjects || []);
+    renderCheckboxes($("#teacherSubjects"), allSubjects().map((subject) => option(subject)), item.subjects || []);
     setActiveSection("teachers");
   }
 
@@ -1501,7 +1691,7 @@
     if (!item || !canEditScope("announcements")) return;
     $("#announcementEditId").value = item.id;
     $("#announcementTitle").value = item.title;
-    $("#announcementAudience").value = item.audience;
+    renderCheckboxes($("#announcementAudience"), announcementAudienceOptions(), normalizeAudiences(item.audiences || item.audience));
     $("#announcementDate").value = item.date;
     $("#announcementPinned").checked = item.pinned;
     $("#announcementBody").value = item.body;
@@ -1512,7 +1702,7 @@
     const item = state.points.find((point) => point.id === id);
     if (!item || !canEditScope("points")) return;
     $("#pointEditId").value = item.id;
-    $("#pointStudent").value = item.studentId;
+    renderCheckboxes($("#pointStudent"), studentOptions(false), [item.studentId]);
     $("#pointType").value = item.type;
     $("#pointValue").value = item.value;
     $("#pointAuthor").value = `${item.authorType || "teacher"}:${item.authorId || ""}`;
@@ -1532,6 +1722,13 @@
 
   init();
 })();
+
+
+
+
+
+
+
 
 
 

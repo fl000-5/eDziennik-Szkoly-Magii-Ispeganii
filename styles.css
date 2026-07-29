@@ -1026,3 +1026,76 @@ tbody tr:hover {
     display: grid;
   }
 }
+
+/* Checkbox-based multi controls */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.checkbox-grid.tall {
+  max-height: 230px;
+  overflow: auto;
+}
+
+.check-option {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.check-option input {
+  width: 16px;
+  min-height: 16px;
+  flex: 0 0 auto;
+}
+
+.check-option span {
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.batch-head {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(170px, 0.8fr) 92px 92px;
+  gap: 10px;
+  margin: 16px 0 6px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.subject-grade-details {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(237, 243, 244, 0.55);
+}
+
+.subject-grade-details summary {
+  margin-bottom: 8px;
+}
+
+.club-fields details p {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 720px) {
+  .batch-head {
+    display: none;
+  }
+}
